@@ -27,10 +27,5 @@ export async function recoverUserInformation(token) {
       "Authorization": `Bearer ${token}`
     }
   });
-  const { user } = request.data;
-  console.log(user);
-  return {
-    token,
-    user
-  }
+  return request.data;
 }

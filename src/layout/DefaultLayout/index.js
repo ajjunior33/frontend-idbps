@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useContext } from 'react';
 import {
   IconButton,
   Avatar,
@@ -29,46 +29,23 @@ import {
   FiMenu,
   FiBell,
   FiChevronDown,
+  FiLogOut,
 } from 'react-icons/fi';
+import LinkNext from 'next/link'
 import { IconType } from 'react-icons';
 import { ReactText } from 'react';
+import { AuthContext } from '../../context/AuthContext';
+import { parseCookies } from 'nookies';
 
 
 const LinkItems = [
-  { name: 'Página Inicial', icon: FiHome },
-  { name: 'Membros', icon: FiUsers },
+  { name: 'Página Inicial', icon: FiHome, path: "/" },
+  { name: 'Membros', icon: FiUsers, path: "/membros" },
 ];
 
-export default function DefaultLayout({
-  children,
-}) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  return (
-    <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
-      <SidebarContent
-        onClose={() => onClose}
-        display={{ base: 'none', md: 'block' }}
-      />
-      <Drawer
-        autoFocus={false}
-        isOpen={isOpen}
-        placement="left"
-        onClose={onClose}
-        returnFocusOnClose={false}
-        onOverlayClick={onClose}
-        size="full">
-        <DrawerContent>
-          <SidebarContent onClose={onClose} />
-        </DrawerContent>
-      </Drawer>
-      {/* mobilenav */}
-      <MobileNav onOpen={onOpen} />
-      <Box ml={{ base: 0, md: 60 }} p="4">
-        {children}
-      </Box>
-    </Box>
-  );
-}
+
+
+
 
 
 
@@ -88,9 +65,11 @@ const SidebarContent = ({ onClose, ...rest }) => {
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
       {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
-          {link.name}
-        </NavItem>
+        <LinkNext key={link.name} href={link.path}>
+          <NavItem icon={link.icon}>
+            {link.name}
+          </NavItem>
+        </LinkNext>
       ))}
     </Box>
   );
@@ -129,7 +108,13 @@ const NavItem = ({ icon, children, ...rest }) => {
 };
 
 
-const MobileNav = ({ onOpen, ...rest }) => {
+const MobileNav = ({ signOut, user, onOpen, ...rest }) => {
+  const name = !!user ? user.name : "";
+  const avatar = !!user ? user.photograph : "";
+  const handleLogout = async () => {
+    return await signOut();
+  }
+
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -154,7 +139,8 @@ const MobileNav = ({ onOpen, ...rest }) => {
         fontSize="2xl"
         fontFamily="monospace"
         fontWeight="bold">
-        Logo
+        <Image src="https://igrejadedeus.org.br/novoImpreza/wp-content/uploads/2018/12/logo_idb--1024x425.png" alt="logo" width={40} />
+
       </Text>
 
       <HStack spacing={{ base: '0', md: '6' }}>
@@ -173,19 +159,18 @@ const MobileNav = ({ onOpen, ...rest }) => {
               <HStack>
                 <Avatar
                   size={'sm'}
-                  src={
-                    'https://avatars.githubusercontent.com/u/16778611?s=400&u=8c622a92d676010feb1b196c6290161eb4ecda02&v=4'
-                  }
+                  src={avatar}
                 />
                 <VStack
                   display={{ base: 'none', md: 'flex' }}
                   alignItems="flex-start"
                   spacing="1px"
                   ml="2">
-                  <Text fontSize="sm">André Souza</Text>
-                  <Text fontSize="xs" color="gray.600">
+                  <Text fontSize="sm">{name}</Text>
+                  {/*<Text fontSize="xs" color="gray.600">
                     Developer
                   </Text>
+                  */}
                 </VStack>
                 <Box display={{ base: 'none', md: 'flex' }}>
                   <FiChevronDown />
@@ -195,11 +180,13 @@ const MobileNav = ({ onOpen, ...rest }) => {
             <MenuList
               bg={useColorModeValue('white', 'gray.900')}
               borderColor={useColorModeValue('gray.200', 'gray.700')}>
-              <MenuItem>Profile</MenuItem>
+              {/*<MenuItem>Profile</MenuItem>
               <MenuItem>Settings</MenuItem>
-              <MenuItem>Billing</MenuItem>
+              <MenuItem>Billing</MenuItem>*/}
               <MenuDivider />
-              <MenuItem>Sign out</MenuItem>
+              <MenuItem color="red" onClick={handleLogout}>
+                <FiLogOut style={{ marginRight: 10 }} /> Sair
+              </MenuItem>
             </MenuList>
           </Menu>
         </Flex>
@@ -207,3 +194,41 @@ const MobileNav = ({ onOpen, ...rest }) => {
     </Flex>
   );
 };
+
+
+
+export default function DefaultLayout({
+  children,
+}) {
+
+  const { user, signOut } = useContext(AuthContext);
+  console.log(user);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  return (
+    <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
+      <SidebarContent
+        onClose={() => onClose}
+        display={{ base: 'none', md: 'block' }}
+      />
+      <Drawer
+        autoFocus={false}
+        isOpen={isOpen}
+        placement="left"
+        onClose={onClose}
+        returnFocusOnClose={false}
+        onOverlayClick={onClose}
+        size="full">
+        <DrawerContent>
+          <SidebarContent onClose={onClose} />
+        </DrawerContent>
+      </Drawer>
+      {/* mobilenav */}
+      <MobileNav onOpen={onOpen} user={user} signOut={signOut} />
+      <Box ml={{ base: 0, md: 60 }} p="4">
+        {children}
+      </Box>
+    </Box>
+  );
+}
+

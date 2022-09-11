@@ -19,7 +19,8 @@ export function AuthProvider({ children }) {
     if (token) {
       recoverUserInformation(token)
         .then(response => {
-          setUser(response.user)
+          console.log(response);
+          setUser(response)
         })
     }
 

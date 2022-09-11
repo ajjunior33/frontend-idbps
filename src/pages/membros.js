@@ -15,6 +15,7 @@ import { FiPlus } from 'react-icons/fi'
 import Link from 'next/link'
 
 import DefaultLayout from '../layout/DefaultLayout'
+import { parseCookies } from 'nookies'
 
 export default function Members() {
   const goToNewMember = () => {
@@ -24,7 +25,7 @@ export default function Members() {
       <DefaultLayout>
         <Box bg={"white"} p="8">
 
-          <Link href="/new-member">
+          <Link href="/novo-membro">
             <Button colorScheme={'cyan'} color="white" onClick={goToNewMember}>
               <FiPlus />
               Novo membro
@@ -71,3 +72,20 @@ export default function Members() {
   )
 }
 
+
+export const getServerSideProps = async (ctx) => {
+  const { ['nextauth.token']: token } = parseCookies(ctx);
+
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false
+      }
+    }
+  }
+
+  return {
+    props: {}
+  }
+}
