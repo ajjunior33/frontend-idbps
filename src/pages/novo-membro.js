@@ -7,6 +7,7 @@ import {
   Switch,
   Select,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { useForm } from 'react-hook-form'
 import { FiUserPlus } from 'react-icons/fi'
@@ -15,9 +16,12 @@ import DefaultLayout from "../layout/DefaultLayout";
 import TransferInChurchComponent from '../components/TransferInChurchComponent';
 import { useEffect, useState } from "react";
 import { parseCookies } from "nookies";
+import { api } from "../service/api";
+import Router from 'next/router'
 
 
 export default function NewMember() {
+  const toast = useToast();
 
   const [transfer, setTransfer] = useState(false);
   useEffect(() => {
@@ -48,7 +52,58 @@ export default function NewMember() {
 
 
   const onSubmit = (data) => {
-    console.log(data);
+    api.post('/members', data)
+      .then(response => {
+        const id = response.data.id
+        if (transfer === true) {
+          const data = {
+            exitChurchPrevious,
+            startChurchCurrent,
+            churchPrevius,
+            chargeInPreviusChurch,
+            descriptionWorkInChurch
+          }
+
+          api.post(`/transfer/${id}`, data)
+            .then(responseTransfer => {
+              toast({
+                title: 'Uhuu!!!',
+                description: "Membro cadastrado com sucesso.",
+                status: 'success',
+                duration: 4000,
+                isClosable: true,
+                onCloseComplete: () => Router.push("/membros")
+              })
+            })
+            .catch(err => {
+              toast({
+                title: 'Opss!!!',
+                description: "Houve um erro ao tentar cadastrar os dados de tranfência do usuário.",
+                status: 'error',
+                duration: 4000,
+                isClosable: true,
+              })
+            })
+
+        } else {
+          toast({
+            title: 'Uhuu!!!',
+            description: "Membro cadastrado com sucesso.",
+            status: 'success',
+            duration: 4000,
+            isClosable: true,
+            onCloseComplete: () => Router.push("/membros")
+          })
+        }
+      }).catch(err => {
+        toast({
+          title: 'Opss!!!',
+          description: "Houve um erro ao tentar cadastrar o usuário.",
+          status: 'error',
+          duration: 4000,
+          isClosable: true,
+        })
+      })
   }
 
 
@@ -69,7 +124,7 @@ export default function NewMember() {
             <FormLabel>Email</FormLabel>
             <Input
               {...register("email", { required: true })}
-              type='email'
+              type='text'
               placeholder="seumelhor@email.com"
             />
           </FormControl>
@@ -92,19 +147,19 @@ export default function NewMember() {
             <FormLabel>Data de nascimento</FormLabel>
             <Input
 
-              {...register("birthDate", { required: true })}
-              type='text'
+              {...register("birthday", { required: true })}
+              type='date'
               placeholder="00/00/0000"
             />
           </FormControl>
           <FormControl my={5}>
             <FormLabel>Gènero</FormLabel>
-            <Select {...register("gender")}>
+            <Select {...register("geneder")}>
               <option selected disabled>Selecione uma opção</option>
-              <option >Masculino</option>
-              <option >Feminino</option>
-              <option >Outros</option>
-              <option >Prefiro não dizer</option>
+              <option value="male">Masculino</option>
+              <option value="femele">Feminino</option>
+              <option value="others">Outros</option>
+              <option value="prefer_not_to_say">Prefiro não dizer</option>
             </Select>
           </FormControl>
 
@@ -120,7 +175,7 @@ export default function NewMember() {
             <FormControl my={5}>
               <FormLabel>Data de batismo</FormLabel>
               <Input
-                {...register("batizedDate")}
+                {...register("baptism_date")}
                 type='date'
               />
             </FormControl>

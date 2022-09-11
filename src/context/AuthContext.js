@@ -22,6 +22,9 @@ export function AuthProvider({ children }) {
           console.log(response);
           setUser(response)
         })
+        .catch(err => {
+          signOut()
+        })
     }
 
   }, []);

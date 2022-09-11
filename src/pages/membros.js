@@ -1,8 +1,14 @@
+import { useEffect, useState } from 'react'
+import { FiEye, FiPlus } from 'react-icons/fi'
+import Link from 'next/link'
+import Router from 'next/router'
+import { parseCookies } from 'nookies'
+import { format } from 'date-fns'
+
 import {
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
@@ -11,59 +17,61 @@ import {
   Box,
   Button,
 } from '@chakra-ui/react'
-import { FiPlus } from 'react-icons/fi'
-import Link from 'next/link'
 
 import DefaultLayout from '../layout/DefaultLayout'
-import { parseCookies } from 'nookies'
+import { api } from '../service/api'
 
 export default function Members() {
-  const goToNewMember = () => {
+  const goToMember = (id) => {
+    return Router.push(`/membro-detalhes/${id}`);
   }
+  const goToNewMember = () => Router.push("/novo-membro")
+  const [listUsers, setListUsers] = useState([]);
+  useEffect(() => {
+    api.get("/members")
+      .then(response => {
+        setListUsers(response.data);
+      });
+  }, []);
+
   return (
     <>
       <DefaultLayout>
         <Box bg={"white"} p="8">
 
-          <Link href="/novo-membro">
-            <Button colorScheme={'cyan'} color="white" onClick={goToNewMember}>
-              <FiPlus />
-              Novo membro
-            </Button></Link>
+
+          <Button colorScheme={'cyan'} color="white" onClick={goToNewMember}>
+            <FiPlus />
+            Novo membro
+          </Button>
           <TableContainer>
             <Table variant='simple'>
               <TableCaption>Imperial to metric conversion factors</TableCaption>
               <Thead>
                 <Tr>
-                  <Th>To convert</Th>
-                  <Th>into</Th>
-                  <Th isNumeric>multiply by</Th>
+                  <Th>Nome</Th>
+                  <Th>Email</Th>
+                  <Th>Data de nascimento</Th>
+                  <Th></Th>
                 </Tr>
               </Thead>
               <Tbody>
-                <Tr>
-                  <Td>inches</Td>
-                  <Td>millimetres (mm)</Td>
-                  <Td isNumeric>25.4</Td>
-                </Tr>
-                <Tr>
-                  <Td>feet</Td>
-                  <Td>centimetres (cm)</Td>
-                  <Td isNumeric>30.48</Td>
-                </Tr>
-                <Tr>
-                  <Td>yards</Td>
-                  <Td>metres (m)</Td>
-                  <Td isNumeric>0.91444</Td>
-                </Tr>
+                {
+                  listUsers.map(user => (
+                    <Tr key={user.id}>
+                      <Td>{user.name}</Td>
+                      <Td>{user.email}</Td>
+                      <Td>{format(new Date(user.birthday), "dd/MM/yyyy")}</Td>
+                      <Td>
+                        <Button colorScheme={"blue"} onClick={() => goToMember(user.id)}>
+                          <FiEye />
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))
+                }
               </Tbody>
-              <Tfoot>
-                <Tr>
-                  <Th>To convert</Th>
-                  <Th>into</Th>
-                  <Th isNumeric>multiply by</Th>
-                </Tr>
-              </Tfoot>
+
             </Table>
           </TableContainer>
         </Box>
