@@ -16,6 +16,7 @@ import {
   Textarea,
 } from '@chakra-ui/react'
 import { FiSave } from 'react-icons/fi'
+import { parseCookies } from 'nookies';
 
 function TransferInChurchComponent({ change, onChange }) {
 
@@ -105,3 +106,25 @@ function TransferInChurchComponent({ change, onChange }) {
   )
 }
 export default TransferInChurchComponent;
+
+
+export const getServerSideProps = async (ctx) => {
+  const apiClient = getAPIClient(ctx);
+  const { ['nextauth.token']: token } = parseCookies(ctx);
+
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false
+      }
+    }
+  }
+
+  //await apiClient.get("/users");
+
+
+  return {
+    props: {}
+  }
+}
