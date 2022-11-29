@@ -12,11 +12,11 @@ import {
 import { useForm } from 'react-hook-form'
 import { FiUserPlus } from 'react-icons/fi'
 
-import DefaultLayout from "../layout/DefaultLayout";
-import TransferInChurchComponent from '../components/TransferInChurchComponent';
+import DefaultLayout from "../../layout/DefaultLayout";
+import TransferInChurchComponent from '../../components/TransferInChurchComponent';
 import { useEffect, useState } from "react";
 import { parseCookies } from "nookies";
-import { api } from "../service/api";
+import { api } from "../../service/api";
 import Router from 'next/router'
 
 
@@ -37,6 +37,8 @@ export default function NewMember() {
   }, [transfer, setTransfer]);
 
   const [batized, setBatized] = useState(false);
+  const [funeralPlan, setFuneralPlan] = useState(false);
+  const [healthPlan, setHealthPlan] = useState(false);
   const [exitChurchPrevious, setExitChurchPrevious] = useState("")
   const [startChurchCurrent, setStartChurchCurrent] = useState("")
   const [churchPrevius, setChurchPrevius] = useState("")
@@ -54,38 +56,6 @@ export default function NewMember() {
   const onSubmit = (data) => {
     api.post('/members', data)
       .then(response => {
-        const id = response.data.id
-        if (transfer === true) {
-          const data = {
-            exitChurchPrevious,
-            startChurchCurrent,
-            churchPrevius,
-            chargeInPreviusChurch,
-            descriptionWorkInChurch
-          }
-
-          api.post(`/transfer/${id}`, data)
-            .then(responseTransfer => {
-              toast({
-                title: 'Uhuu!!!',
-                description: "Membro cadastrado com sucesso.",
-                status: 'success',
-                duration: 4000,
-                isClosable: true,
-                onCloseComplete: () => Router.push("/membros")
-              })
-            })
-            .catch(err => {
-              toast({
-                title: 'Opss!!!',
-                description: "Houve um erro ao tentar cadastrar os dados de tranfência do usuário.",
-                status: 'error',
-                duration: 4000,
-                isClosable: true,
-              })
-            })
-
-        } else {
           toast({
             title: 'Uhuu!!!',
             description: "Membro cadastrado com sucesso.",
@@ -94,7 +64,7 @@ export default function NewMember() {
             isClosable: true,
             onCloseComplete: () => Router.push("/membros")
           })
-        }
+
       }).catch(err => {
         toast({
           title: 'Opss!!!',
@@ -181,8 +151,6 @@ export default function NewMember() {
             </FormControl>
           )}
 
-          <TransferInChurchComponent change={transfer} onChange={setTransfer} />
-
           {transfer === true && (
             <Box p={5} borderWidth="2px" mt={5} borderColor={"gray.300"} borderRadius={5}>
               <Text>Data de saída da igreja antérior: {exitChurchPrevious}</Text>
@@ -193,6 +161,22 @@ export default function NewMember() {
             </Box>
           )}
 
+          <Box my={5}>
+            <FormControl display='flex' alignItems='center'>
+              <FormLabel htmlFor='funeralPlan' mb='0'>
+                Possuí plano de saúde?
+              </FormLabel>
+              <Switch id='funeralPlan'  {...register("batized")} value={funeralPlan} onChange={e => setFuneralPlan(!funeralPlan)}  />
+            </FormControl>
+          </Box>
+          <Box>
+            <FormControl display='flex' alignItems='center'>
+              <FormLabel htmlFor='healthPlan' mb='0'>
+                Possuí plano funerário?
+              </FormLabel>
+              <Switch id='healthPlan' {...register("healthPlan")} value={healthPlan} onChange={e => setHealthPlan(!healthPlan)} />
+            </FormControl>
+          </Box>
           <FormControl>
             <Button type="submit" colorScheme={"facebook"} mt={3}>
               <FiUserPlus style={{ marginRight: 10 }} />

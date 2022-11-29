@@ -18,14 +18,14 @@ import {
   Button,
 } from '@chakra-ui/react'
 
-import DefaultLayout from '../layout/DefaultLayout'
-import { api } from '../service/api'
+import DefaultLayout from '../../layout/DefaultLayout'
+import { api } from '../../service/api'
 
 export default function Members() {
   const goToMember = (id) => {
-    return Router.push(`/membro-detalhes/${id}`);
+    return Router.push(`/membros/${id}`);
   }
-  const goToNewMember = () => Router.push("/novo-membro")
+  const goToNewMember = () => Router.push("/membros/new")
   const [listUsers, setListUsers] = useState([]);
   useEffect(() => {
     api.get("/members")

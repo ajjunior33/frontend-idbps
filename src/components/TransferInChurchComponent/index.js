@@ -13,11 +13,15 @@ import {
   FormLabel,
   Input,
   Textarea,
+  useToast
 } from '@chakra-ui/react'
-import { FiSave } from 'react-icons/fi'
+import { FiSave, FiPlus } from 'react-icons/fi'
 import { parseCookies } from 'nookies';
+import {api} from '../../service/api'
 
-function TransferInChurchComponent({ change, onChange }) {
+function TransferInChurchComponent({id}) {
+
+  const toast = useToast();
 
   const [exitChurchPrevious, setExitChurchPrevious] = useState("");
   const [startChurchCurrent, setStartChurchCurrent] = useState("");
@@ -32,16 +36,35 @@ function TransferInChurchComponent({ change, onChange }) {
       chargeInPreviusChurch,
       descriptionWorkInChurch,
     }
-    localStorage.setItem("previusChurchData", JSON.stringify(data));
-    onChange(true)
-    onClose();
+
+    api.post(`/transfer/${id}`, data)
+      .then(responseTransfer => {
+        toast({
+          title: 'Uhuu!!!',
+          description: "Histórico cadastrado com sucesso.",
+          status: 'success',
+          duration: 4000,
+          isClosable: true,
+        })
+      })
+      .catch(err => {
+        toast({
+          title: 'Opss!!!',
+          description: "Houve um erro ao tentar cadastrar os dados de tranfência do usuário.",
+          status: 'error',
+          duration: 4000,
+          isClosable: true,
+        })
+      })
+      onClose();
+
   };
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
 
     <>
 
-      <Button size={"sm"} colorScheme="facebook" onClick={onOpen}>Dados de tranferência entre igrejas</Button>
+      <Button colorScheme="green" onClick={onOpen}><FiPlus /> Transferência entre igrejas</Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
