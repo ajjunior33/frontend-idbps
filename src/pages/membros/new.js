@@ -9,7 +9,12 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
+
+
 import { useForm } from 'react-hook-form'
+
+import InputMask from 'react-input-mask'
+
 import { FiUserPlus } from 'react-icons/fi'
 
 import DefaultLayout from "../../layout/DefaultLayout";
@@ -36,7 +41,7 @@ export default function NewMember() {
     }
   }, [transfer, setTransfer]);
 
-  const [batized, setBatized] = useState(false);
+  const [baptized, setBaptized] = useState(false);
   const [funeralPlan, setFuneralPlan] = useState(false);
   const [healthPlan, setHealthPlan] = useState(false);
   const [exitChurchPrevious, setExitChurchPrevious] = useState("")
@@ -56,14 +61,14 @@ export default function NewMember() {
   const onSubmit = (data) => {
     api.post('/members', data)
       .then(response => {
-          toast({
-            title: 'Uhuu!!!',
-            description: "Membro cadastrado com sucesso.",
-            status: 'success',
-            duration: 4000,
-            isClosable: true,
-            onCloseComplete: () => Router.push("/membros")
-          })
+        toast({
+          title: 'Uhuu!!!',
+          description: "Membro cadastrado com sucesso.",
+          status: 'success',
+          duration: 4000,
+          isClosable: true,
+          onCloseComplete: () => Router.push("/membros")
+        })
 
       }).catch(err => {
         toast({
@@ -100,18 +105,33 @@ export default function NewMember() {
           </FormControl>
           <FormControl my={5}>
             <FormLabel>Telefone</FormLabel>
-            <Input
+
+            <InputMask mask="99 99999 9999"
               {...register("phone", { required: true })}
               type='text'
-              placeholder="+00 00 00000 0000"
-            />
+              placeholder="00 00000 0000">
+              {(inputProps) =>
+                <Input
+                  {...inputProps}
+                />}
+            </InputMask>
+
+
           </FormControl>
           <FormControl my={5}>
             <FormLabel>CPF</FormLabel>
-            <Input
+            <InputMask
+              mask="999.999.999-99"
               {...register("document", { required: true })}
               type='text'
-              placeholder="000.000.000-00" />
+              placeholder="000.000.000-00"
+            >
+              {(inputProps) =>
+                <Input
+                  {...inputProps}
+                />}
+            </InputMask>
+
           </FormControl >
           <FormControl my={5}>
             <FormLabel>Data de nascimento</FormLabel>
@@ -138,7 +158,7 @@ export default function NewMember() {
             <FormLabel htmlFor='batized' my='5'>
               Batizado ?
             </FormLabel>
-            <Switch id='batized' {...register("batized")} value={batized} onChange={e => setBatized(!batized)} />
+            <Switch id='baptized' {...register("baptized")} value={baptized} onChange={e => setBaptized(!baptized)} />
           </FormControl>
 
           {batized === true && (
@@ -166,7 +186,7 @@ export default function NewMember() {
               <FormLabel htmlFor='funeralPlan' mb='0'>
                 Possuí plano de saúde?
               </FormLabel>
-              <Switch id='funeralPlan'  {...register("batized")} value={funeralPlan} onChange={e => setFuneralPlan(!funeralPlan)}  />
+              <Switch id='funeralPlan'  {...register("batized")} value={funeralPlan} onChange={e => setFuneralPlan(!funeralPlan)} />
             </FormControl>
           </Box>
           <Box>

@@ -21,6 +21,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.35.0",
     "react-icons": "^4.4.0",
+    "react-input-mask": "^2.0.4",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
